@@ -27,12 +27,7 @@ func (letter Letter) Write(buffer io.Writer) error {
 	buffer.Write(byteSlice)
 	buffer.Write([]byte{'\n'})
 
-	for key, value := range letter.Parameters {
-		buffer.Write([]byte(key))
-		buffer.Write([]byte{'='})
-		buffer.Write([]byte(value))
-		buffer.Write([]byte{'\n'})
-	}
+	letter.Parameters.Write(buffer)
 
 	buffer.Write([]byte(letter.Body))
 	buffer.Write([]byte{'\r'})
