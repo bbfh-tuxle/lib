@@ -1,31 +1,26 @@
 package protocol_test
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/binary"
 	"io"
-	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/bbfh-tuxle/lib/field"
+	"github.com/bbfh-tuxle/lib/field/parser"
 	"github.com/bbfh-tuxle/lib/protocol"
 )
 
-func assert[T string | protocol.Letter](t *testing.T, got T, expected T) {
-	if !reflect.DeepEqual(got, expected) {
-		t.Fatalf("Expected `%v`, Got `%v`", expected, got)
-	}
-}
-
 func TestLetterType(t *testing.T) {
-	data, err := protocol.ReadLetterType(strings.NewReader("DONE message\r"))
+	data, err := protocol.ReadLetterType(bufio.NewReader(strings.NewReader("DONE message\r")))
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert(t, data, "DONE")
+	parser.Assert(t, data, "DONE")
 
-	data, err = protocol.ReadLetterType(strings.NewReader("INVALID"))
+	data, err = protocol.ReadLetterType(bufio.NewReader(strings.NewReader("INVALID")))
 	if err != io.EOF {
 		t.Fatal(err)
 	}
@@ -43,11 +38,11 @@ func TestLetterNoParams(t *testing.T) {
 	buffer.Write(byteSlice)
 	buffer.WriteString("\nBody\r")
 
-	data, err := protocol.ReadLetter(strings.NewReader(buffer.String()))
+	data, err := protocol.ReadLetter(bufio.NewReader(strings.NewReader(buffer.String())))
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert(t, data, protocol.Letter{
+	parser.Assert(t, data, protocol.Letter{
 		Type:       "TEST",
 		Endpoint:   "message",
 		Parameters: field.NewParameters(),
@@ -67,11 +62,11 @@ func TestLetterHeaderOnly(t *testing.T) {
 	buffer.Write(byteSlice)
 	buffer.WriteString("\n\r")
 
-	data, err := protocol.ReadLetter(strings.NewReader(buffer.String()))
+	data, err := protocol.ReadLetter(bufio.NewReader(strings.NewReader(buffer.String())))
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert(t, data, protocol.Letter{
+	parser.Assert(t, data, protocol.Letter{
 		Type:       "TEST",
 		Endpoint:   "message",
 		Parameters: field.NewParameters(),
@@ -80,7 +75,7 @@ func TestLetterHeaderOnly(t *testing.T) {
 }
 
 func TestLetterWrongType(t *testing.T) {
-	_, err := protocol.ReadLetter(strings.NewReader("TEST message\nINVALID\n\r"))
+	_, err := protocol.ReadLetter(bufio.NewReader(strings.NewReader("TEST message\nINVALID\n\r")))
 	if err == nil {
 		t.Fatal("Expected to fail")
 	}
@@ -98,14 +93,14 @@ func TestLetterParameters(t *testing.T) {
 	buffer.Write(byteSlice)
 	buffer.WriteString("\nKeyA=ValueA\nKeyB=ValueB\n\r")
 
-	data, err := protocol.ReadLetter(strings.NewReader(buffer.String()))
+	data, err := protocol.ReadLetter(bufio.NewReader(strings.NewReader(buffer.String())))
 	if err != nil {
 		t.Fatal(err)
 	}
 	params := field.NewParameters()
 	params["KeyA"] = "ValueA"
 	params["KeyB"] = "ValueB"
-	assert(t, data, protocol.Letter{
+	parser.Assert(t, data, protocol.Letter{
 		Type:       "TEST",
 		Endpoint:   "message",
 		Parameters: params,
@@ -129,13 +124,13 @@ func TestLetterComplete(t *testing.T) {
 	buffer.WriteString(body)
 	buffer.WriteString("\r")
 
-	data, err := protocol.ReadLetter(strings.NewReader(buffer.String()))
+	data, err := protocol.ReadLetter(bufio.NewReader(strings.NewReader(buffer.String())))
 	if err != nil {
 		t.Fatal(err)
 	}
 	params := field.NewParameters()
 	params["KeyA"] = "ValueA"
-	assert(t, data, protocol.Letter{
+	parser.Assert(t, data, protocol.Letter{
 		Type:       "TEST",
 		Endpoint:   "message",
 		Parameters: params,
@@ -159,9 +154,9 @@ func TestLetterWriteComplete(t *testing.T) {
 	var buffer bytes.Buffer
 	letter.Write(&buffer)
 
-	got, err := protocol.ReadLetter(strings.NewReader(buffer.String()))
+	got, err := protocol.ReadLetter(bufio.NewReader(strings.NewReader(buffer.String())))
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert(t, got, letter)
+	parser.Assert(t, got, letter)
 }
