@@ -7,13 +7,18 @@ import (
 	"fmt"
 )
 
+// The size of the Database header size in bytes
 const DB_HEADER_SIZE int64 = 8
 
+// A file that database will read from.
+//
+// An *os.File will always satisfy this interface.
 type File interface {
 	Read([]byte) (int, error)
 	ReadAt([]byte, int64) (int, error)
 }
 
+// A single `.db` file with helper functions for reading/writing.
 type Database struct {
 	Size uint64
 	file File
@@ -32,6 +37,7 @@ func NewDatabase(file File) (Database, error) {
 	}, nil
 }
 
+// Reads message at a certain index starting from the OLDEST message.
 func (db Database) ReadOldestMessage(index int64) (Message, error) {
 	if db.Size == 0 {
 		return Message{}, errors.New("Trying to read an empty database!")
@@ -46,6 +52,9 @@ func (db Database) ReadOldestMessage(index int64) (Message, error) {
 	return ReadMessage(bytes.NewReader(data))
 }
 
+// Reads message at a certain index starting from the NEWEST message.
+//
+// Returns an error if index is out of bounds.
 func (db Database) ReadNewestMessage(index int64) (Message, error) {
 	if db.Size == 0 {
 		return Message{}, errors.New("Trying to read an empty database!")
