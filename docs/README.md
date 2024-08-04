@@ -7,6 +7,11 @@
 [BODY]
 ```
 
+`<#b7>`
+`<35#b7>`
+`<root@127.0.0.1:16400>`
+`<@127.0.0.1:16400>`
+
 # Channel
 
 - `00`
@@ -36,7 +41,7 @@ LatestMessageIndex=15
 ## messages.list
 
 ```
-[uint64 timestamp][16.byte user][1.byte chunk][uint64 line]
+[uint64 timestamp][byte chunk][uint64 line][16 bytes user]
 ```
 
 ## tiny.db / small.db / medium.db / large.db
