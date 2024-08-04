@@ -33,6 +33,8 @@ func readEntireParameters(reader *bufio.Reader) (Parameters, error) {
 // Read (parse) Parameters.
 //
 // `count` — The amount of lines to expect. Set to -1 to parse until io.EOF
+//
+// Returns EOF if Parameters format is invalid.
 func ReadParameters(reader *bufio.Reader, count int) (Parameters, error) {
 	if count == -1 {
 		return readEntireParameters(reader)
