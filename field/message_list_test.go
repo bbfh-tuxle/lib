@@ -58,13 +58,13 @@ func getMessagesBuffer(messages []field.Message) (bytes.Buffer, error) {
 	return buffer, nil
 }
 
-func TestDatabaseEmpty(t *testing.T) {
+func TestMessageListEmpty(t *testing.T) {
 	buffer, err := getMessagesBuffer([]field.Message{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	db, err := field.NewDatabase(NewMockFile(buffer.Bytes()))
+	db, err := field.NewMessageList(NewMockFile(buffer.Bytes()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func TestDatabaseEmpty(t *testing.T) {
 	}
 }
 
-func TestDatabaseSingle(t *testing.T) {
+func TestMessageListSingle(t *testing.T) {
 	msg := field.Message{
 		Timestamp: 1722765647,
 		ChunkId:   2,
@@ -89,7 +89,7 @@ func TestDatabaseSingle(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	db, err := field.NewDatabase(NewMockFile(buffer.Bytes()))
+	db, err := field.NewMessageList(NewMockFile(buffer.Bytes()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func TestDatabaseSingle(t *testing.T) {
 	parser.Assert(t, message, msg)
 }
 
-func TestDatabaseLatest(t *testing.T) {
+func TestMessageListLatest(t *testing.T) {
 	latest := field.Message{
 		Timestamp: 1722765647,
 		ChunkId:   2,
@@ -122,7 +122,7 @@ func TestDatabaseLatest(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	db, err := field.NewDatabase(NewMockFile(buffer.Bytes()))
+	db, err := field.NewMessageList(NewMockFile(buffer.Bytes()))
 	if err != nil {
 		t.Fatal(err)
 	}
