@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-const MESSAGE_SIZE = 64 + 1 + 64 + 16
+const MESSAGE_SIZE int64 = 8 + 1 + 8 + 16
 
 type Message struct {
 	Timestamp uint64
