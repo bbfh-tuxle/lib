@@ -20,7 +20,7 @@ type File interface {
 
 // A single `.db` file with helper functions for reading/writing.
 type Database struct {
-	Size uint64
+	Size uint64 // The amount of messages in the database
 	file File
 }
 
