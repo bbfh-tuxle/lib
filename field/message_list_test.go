@@ -10,37 +10,6 @@ import (
 	"github.com/bbfh-tuxle/lib/field/parser"
 )
 
-type MockFile struct {
-	content []byte
-	offset  int64
-}
-
-func NewMockFile(content []byte) *MockFile {
-	return &MockFile{content: content, offset: 0}
-}
-
-// Read reads up to len(p) bytes into p from the file
-func (file *MockFile) Read(p []byte) (int, error) {
-	if file.offset >= int64(len(file.content)) {
-		return 0, io.EOF
-	}
-	n := copy(p, file.content[file.offset:])
-	file.offset += int64(n)
-	return n, nil
-}
-
-// ReadAt reads len(p) bytes into p from the file at offset off
-func (file *MockFile) ReadAt(p []byte, off int64) (int, error) {
-	if off >= int64(len(file.content)) {
-		return 0, io.EOF
-	}
-	n := copy(p, file.content[off:])
-	if n < len(p) {
-		return n, io.EOF
-	}
-	return n, nil
-}
-
 func getMessagesBuffer(messages []field.Message) (bytes.Buffer, error) {
 	var buffer bytes.Buffer
 

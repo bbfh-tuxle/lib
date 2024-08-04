@@ -9,4 +9,5 @@ const LIST_HEADER_SIZE int64 = 8
 type File interface {
 	Read([]byte) (int, error)
 	ReadAt([]byte, int64) (int, error)
+	WriteAt([]byte, int64) (int, error)
 }
