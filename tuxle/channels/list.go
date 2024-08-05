@@ -74,6 +74,7 @@ func (list *ListFile) ReadNewestEntry(index int64) (*Entry, error) {
 	return ReadEntry(bytes.NewReader(data))
 }
 
+// Appends an entry to the end of the list file.
 func (list *ListFile) AppendEntry(entry *Entry) error {
 	list.Size += 1
 
@@ -92,6 +93,7 @@ func (list *ListFile) AppendEntry(entry *Entry) error {
 	return err
 }
 
+// Writes an entry to certain position in the list file.
 func (list *ListFile) OverwriteEntry(entry *Entry, index int64) error {
 	if index > list.Size {
 		return errors.New("Index is out of bounds!")

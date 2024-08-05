@@ -19,7 +19,8 @@ Tuxle library for reading & writing custom data formats. Used by both Tuxle serv
     * [Writing entry](#writing-entry)
     * [List file](#list-file)
     * [Read list file entry](#read-list-file-entry)
-    * [Write to the list file](#write-to-the-list-file)
+    * [Append entry to list file](#append-entry-to-list-file)
+    * [Overwrite an entry in list file](#overwrite-an-entry-in-list-file)
     * [Database](#database)
     * [Read a chunk](#read-a-chunk)
     * [Append chunk to database](#append-chunk-to-database)
@@ -214,9 +215,23 @@ or
 func (list ListFile) ReadNewestEntry(index int64) (*Entry, error)
 ```
 
-## Write to the list file
+## Append entry to list file
 
-> TODO
+To add a new entry to the end of the list file use `*ListFile.AppendEntry` method:
+
+```go
+// Appends an entry to the end of the list file.
+func (list *ListFile) AppendEntry(entry *Entry) error
+```
+
+## Overwrite an entry in list file
+
+To edit any entry you can use the `*ListFile.OverwriteEntry` method:
+
+```go
+// Writes an entry to certain position in the list file.
+func (list *ListFile) OverwriteEntry(entry *Entry, index int64) error
+```
 
 ## Database
 
