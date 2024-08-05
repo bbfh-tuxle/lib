@@ -2,6 +2,8 @@
 
 Tuxle library for reading & writing custom data formats. Used by both Tuxle server & Tuxle client.
 
+All functions/structs are documented in the code. This document is a brief overview of parts that might need additional explanation.
+
 <!-- vim-markdown-toc GFM -->
 
 * [📃 Protocol](#-protocol)
@@ -10,21 +12,10 @@ Tuxle library for reading & writing custom data formats. Used by both Tuxle serv
     * [Write Letter](#write-letter)
 * [🗳️ Fields](#-fields)
     * [Parameters](#parameters)
-    * [Reading parameters](#reading-parameters)
-    * [Writing parameters](#writing-parameters)
 * [📁 Channels](#-channels)
     * [File interface](#file-interface)
     * [List entry](#list-entry)
-    * [Reading an entry](#reading-an-entry)
-    * [Writing entry](#writing-entry)
-    * [List file](#list-file)
-    * [Read list file entry](#read-list-file-entry)
-    * [Append entry to list file](#append-entry-to-list-file)
-    * [Overwrite an entry in list file](#overwrite-an-entry-in-list-file)
     * [Database](#database)
-    * [Read a chunk](#read-a-chunk)
-    * [Append chunk to database](#append-chunk-to-database)
-    * [Overwrite a chunk in database](#overwrite-a-chunk-in-database)
 
 <!-- vim-markdown-toc -->
 
@@ -107,39 +98,6 @@ Fields contains helpful types that are usually used as fields of other structs.
 
 Parameters is an alias to `map[string]string` with extra convinient functions as a part of Tuxle format.
 
-## Reading parameters
-
-When reading a parameters file, you can use `fields.ReadAllParameters`:
-
-```go
-// Read (parse) Parameters. until io.EOF.
-//
-// err == io.EOF if parameters have invalid format
-func ReadAllParameters(reader *bufio.Reader) (Parameters, error)
-```
-
-For reading parameters embedded in a letter (with a predefined number of parameters) use `fields.ReadParameters`:
-
-```go
-// Read (parse) Parameters.
-//
-// `count` — The amount of lines to expect. Use ReadAllParameters() to read until io.EOF.
-//
-// err == io.EOF if parameters have invalid format or count > number of parameters.
-func ReadParameters(reader *bufio.Reader, count int) (Parameters, error)
-```
-
-## Writing parameters
-
-To encode the Parameters use `Parameters.Write` method:
-
-```go
-// Write the Parameters to an io.Writter in the correct format.
-//
-// No-op when Parameters are empty.
-func (params Parameters) Write(buffer io.Writer)
-```
-
 # 📁 Channels
 
 This module handles reading/writing to custom file formats.
@@ -169,70 +127,6 @@ type Entry struct {
 }
 ```
 
-## Reading an entry
-
-To read the entry use `channels.ReadEntry`, a single entry is **64 bytes**.
-
-```go
-func ReadEntry(reader io.Reader) (*Entry, error)
-```
-
-## Writing entry
-
-To write entry into **64 bytes** use `Entry.Write` method.
-
-```go
-func (entry Entry) Write(buffer io.Writer) error
-```
-
-## List file
-
-Open a file (e.g. `/tmp/messages.list`) and then create a `channels.ListFile`. It will write the header to the file if the file is empty to ensure it uses valid format.
-
-```go
-func NewListFile(file File) (*ListFile, error)
-```
-
-## Read list file entry
-
-You can read a `channels.Entry` from the list file using either of the following methods:
-
-```go
-// Reads entry at a certain index starting from the OLDEST entry.
-//
-// Entry is nil if an error occured.
-func (list ListFile) ReadOldestEntry(index int64) (*Entry, error)
-```
-
-or
-
-```go
-// Reads entry at a certain index starting from the NEWEST entry.
-//
-// Returns an error if index is out of bounds.
-//
-// Entry is nil if an error occured.
-func (list ListFile) ReadNewestEntry(index int64) (*Entry, error)
-```
-
-## Append entry to list file
-
-To add a new entry to the end of the list file use `*ListFile.AppendEntry` method:
-
-```go
-// Appends an entry to the end of the list file.
-func (list *ListFile) AppendEntry(entry *Entry) error
-```
-
-## Overwrite an entry in list file
-
-To edit any entry you can use the `*ListFile.OverwriteEntry` method:
-
-```go
-// Writes an entry to certain position in the list file.
-func (list *ListFile) OverwriteEntry(entry *Entry, index int64) error
-```
-
 ## Database
 
 In [ListEntry](#list-entry) you can see the `ChunkId` variables, it's used to describe which database the message is stored in (255 possible values).
@@ -251,33 +145,4 @@ To create a database, open a file (e.g. `/tmp/tiny.db`) and then use `channels.N
 
 ```go
 func NewDatabase(file File, chunkSize int64) (*Database, error)
-```
-
-## Read a chunk
-
-Once the database is open, you can read chunk at a specific index:
-
-```go
-// Reads chunk at a specific index.
-//
-// Returns io.EOF when reading out of bounds data
-func (db *Database) ReadChunk(index int64) (string, error)
-```
-
-## Append chunk to database
-
-To add a new chunk to the end of the database file use `*Database.AppendChunk` method:
-
-```go
-// Appends a chunk to the end of the database.
-func (db *Database) AppendChunk(chunk string) error
-```
-
-## Overwrite a chunk in database
-
-To edit any chunk you can use the `*Database.OverwriteChunk` method:
-
-```go
-// Writes a chunk to certain position in the database.
-func (db *Database) OverwriteChunk(chunk string, index int64) error
 ```
