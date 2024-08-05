@@ -2,6 +2,7 @@ package channels
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 
@@ -71,4 +72,34 @@ func (list *ListFile) ReadNewestEntry(index int64) (*Entry, error) {
 	}
 
 	return ReadEntry(bytes.NewReader(data))
+}
+
+func (list *ListFile) AppendEntry(entry *Entry) error {
+	list.Size += 1
+
+	byteSize := make([]byte, 8)
+	binary.BigEndian.PutUint64(byteSize, uint64(list.Size))
+
+	_, err := list.file.WriteAt(byteSize, 0)
+	if err != nil {
+		return err
+	}
+
+	var buffer bytes.Buffer
+	entry.Write(&buffer)
+
+	_, err = list.file.WriteAt(buffer.Bytes(), LIST_CONTENT_OFFSET+ENTRY_SIZE*(list.Size-1))
+	return err
+}
+
+func (list *ListFile) OverwriteEntry(entry *Entry, index int64) error {
+	if index > list.Size {
+		return errors.New("Index is out of bounds!")
+	}
+
+	var buffer bytes.Buffer
+	entry.Write(&buffer)
+
+	_, err := list.file.WriteAt(buffer.Bytes(), LIST_CONTENT_OFFSET+ENTRY_SIZE*index)
+	return err
 }
