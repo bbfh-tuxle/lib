@@ -17,9 +17,9 @@ type Entry struct {
 
 func (entry Entry) Write(buffer io.Writer) error {
 	stream.WriteUint64(buffer, entry.Timestamp)
-	buffer.Write([]byte{entry.ChunkId})
+	_, err := buffer.Write([]byte{entry.ChunkId})
 	stream.WriteUint64(buffer, entry.ChunkLine)
 	stream.WriteChars47(buffer, entry.UserId)
 
-	return nil
+	return err
 }
