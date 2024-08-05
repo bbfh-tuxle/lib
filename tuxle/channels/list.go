@@ -22,7 +22,9 @@ func NewListFile(file File) (*ListFile, error) {
 		stream.WriteInt64(&buffer, 0)
 
 		_, err = file.WriteAt(buffer.Bytes(), 0)
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &ListFile{

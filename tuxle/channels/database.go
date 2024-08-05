@@ -22,7 +22,9 @@ func NewDatabase(file File, chunkSize int64) (*Database, error) {
 		stream.WriteInt64(&buffer, 0)
 
 		_, err = file.WriteAt(buffer.Bytes(), 0)
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &Database{
