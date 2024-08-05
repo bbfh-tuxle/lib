@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"bytes"
 	"encoding/binary"
 	"io"
 )
@@ -51,4 +52,14 @@ func WriteChars8192(buffer io.Writer, str string) {
 	var byteUser [8192]byte
 	copy(byteUser[:], []byte(str))
 	buffer.Write(byteUser[:])
+}
+
+type writableAsString interface {
+	Write(io.Writer)
+}
+
+func WriteToString(writer writableAsString) string {
+	var buffer bytes.Buffer
+	writer.Write(&buffer)
+	return buffer.String()
 }
