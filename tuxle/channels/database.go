@@ -37,7 +37,7 @@ func NewDatabase(file File, chunkSize int64) (*Database, error) {
 // Returns io.EOF when reading out of bounds data
 func (db *Database) ReadChunk(index int64) (string, error) {
 	if db.Size == 0 {
-		return "", errors.New("Trying to read an empty message list!")
+		return "", errors.New("Trying to read an empty database!")
 	}
 
 	var data = make([]byte, db.ChunkSize)
