@@ -18,6 +18,10 @@ type ListFile struct {
 func NewListFile(file File) (*ListFile, error) {
 	size, err := stream.ReadInt64(file)
 	if err != nil {
+		var buffer bytes.Buffer
+		stream.WriteInt64(&buffer, 0)
+
+		_, err = file.WriteAt(buffer.Bytes(), 0)
 		return nil, err
 	}
 

@@ -18,6 +18,10 @@ type Database struct {
 func NewDatabase(file File, chunkSize int64) (*Database, error) {
 	size, err := stream.ReadInt64(file)
 	if err != nil {
+		var buffer bytes.Buffer
+		stream.WriteInt64(&buffer, 0)
+
+		_, err = file.WriteAt(buffer.Bytes(), 0)
 		return nil, err
 	}
 
