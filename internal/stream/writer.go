@@ -17,6 +17,12 @@ func WriteUint64(buffer io.Writer, number uint64) {
 	buffer.Write(byteSlice)
 }
 
+func WriteInt64(buffer io.Writer, number int64) {
+	byteSlice := make([]byte, 8)
+	binary.BigEndian.PutUint64(byteSlice, uint64(number))
+	buffer.Write(byteSlice)
+}
+
 func WriteChars47(buffer io.Writer, str string) {
 	var byteUser [47]byte
 	copy(byteUser[:], []byte(str))
