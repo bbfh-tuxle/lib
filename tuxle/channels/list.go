@@ -34,7 +34,7 @@ func NewListFile(file File) (*ListFile, error) {
 // Reads entry at a certain index starting from the OLDEST entry.
 //
 // Entry is nil if an error occured.
-func (list ListFile) ReadOldestEntry(index int64) (*Entry, error) {
+func (list *ListFile) ReadOldestEntry(index int64) (*Entry, error) {
 	if list.Size == 0 {
 		return nil, errors.New("Trying to read an empty list!")
 	}
@@ -53,7 +53,7 @@ func (list ListFile) ReadOldestEntry(index int64) (*Entry, error) {
 // Returns an error if index is out of bounds.
 //
 // Entry is nil if an error occured.
-func (list ListFile) ReadNewestEntry(index int64) (*Entry, error) {
+func (list *ListFile) ReadNewestEntry(index int64) (*Entry, error) {
 	if list.Size == 0 {
 		return nil, errors.New("Trying to read an empty list!")
 	}
