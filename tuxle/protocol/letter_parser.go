@@ -3,8 +3,8 @@ package protocol
 import (
 	"bufio"
 
-	"github.com/bbfh-tuxle/lib/field"
-	"github.com/bbfh-tuxle/lib/field/parser"
+	"github.com/bbfh-tuxle/lib/internal/stream"
+	"github.com/bbfh-tuxle/lib/tuxle/fields"
 )
 
 // Reads (parses) Letter.Type (and only that).
@@ -13,36 +13,36 @@ import (
 //
 // Returns EOF if Parameters format is invalid.
 func ReadLetterType(reader *bufio.Reader) (string, error) {
-	return parser.ReadString(reader, ' ')
+	return stream.ReadString(reader, ' ')
 }
 
 // Reads (parses) the entire Letter.
 //
 // Returns EOF if Parameters format is invalid.
-func ReadLetter(reader *bufio.Reader) (Letter, error) {
-	letterType, err := parser.ReadString(reader, ' ')
+func ReadLetter(reader *bufio.Reader) (*Letter, error) {
+	letterType, err := stream.ReadString(reader, ' ')
 	if err != nil {
-		return Letter{}, err
+		return nil, err
 	}
 
-	letterEndpoint, err := parser.ReadString(reader, '\n')
+	letterEndpoint, err := stream.ReadString(reader, '\n')
 	if err != nil {
-		return Letter{}, err
+		return nil, err
 	}
 
-	numberOfParameters, err := parser.ReadUInt32(reader, '\n')
+	numberOfParameters, err := stream.ReadUint32(reader)
 	if err != nil {
-		return Letter{}, err
+		return nil, err
 	}
 
-	parameters, err := field.ReadParameters(reader, int(numberOfParameters))
+	parameters, err := fields.ReadParameters(reader, int(numberOfParameters))
 
-	body, err := parser.ReadString(reader, '\r')
+	body, err := stream.ReadString(reader, '\r')
 	if err != nil {
-		return Letter{}, err
+		return nil, err
 	}
 
-	return Letter{
+	return &Letter{
 		Type:       letterType,
 		Endpoint:   letterEndpoint,
 		Parameters: parameters,

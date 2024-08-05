@@ -1,7 +1,4 @@
-package field
-
-// The size of the MessageList header size in bytes
-const LIST_HEADER_SIZE int64 = 8
+package channels
 
 // A file that message list will read from.
 //

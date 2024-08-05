@@ -1,21 +1,19 @@
-package field_test
+package channels_test
 
 import (
 	"bytes"
-	"encoding/binary"
 	"io"
 	"testing"
 
-	"github.com/bbfh-tuxle/lib/field"
-	"github.com/bbfh-tuxle/lib/field/parser"
+	"github.com/bbfh-tuxle/lib/internal/stream"
+	"github.com/bbfh-tuxle/lib/tuxle/channels"
+	"gotest.tools/assert"
 )
 
-func getMessagesBuffer(messages []field.Message) (bytes.Buffer, error) {
+func makeEntriesBuffer(messages []*channels.Entry) (bytes.Buffer, error) {
 	var buffer bytes.Buffer
 
-	byteHeader := make([]byte, 8)
-	binary.BigEndian.PutUint64(byteHeader, uint64(len(messages)))
-	buffer.Write(byteHeader)
+	stream.WriteUint64(&buffer, uint64(len(messages)))
 
 	for _, message := range messages {
 		err := message.Write(&buffer)
@@ -28,57 +26,57 @@ func getMessagesBuffer(messages []field.Message) (bytes.Buffer, error) {
 }
 
 func TestMessageListEmpty(t *testing.T) {
-	buffer, err := getMessagesBuffer([]field.Message{})
+	buffer, err := makeEntriesBuffer([]*channels.Entry{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	db, err := field.NewMessageList(NewMockFile(buffer.Bytes()))
+	db, err := channels.NewListFile(NewMockFile(buffer.Bytes()))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = db.ReadOldestMessage(0)
+	_, err = db.ReadOldestEntry(0)
 	if err == nil {
 		t.Fatal("Should fail because the file is empty!")
 	}
 }
 
 func TestMessageListSingle(t *testing.T) {
-	msg := field.Message{
+	msg := &channels.Entry{
 		Timestamp: 1722765647,
 		ChunkId:   2,
 		ChunkLine: 6,
 		UserId:    "1234567890abcdef",
 	}
-	buffer, err := getMessagesBuffer([]field.Message{
+	buffer, err := makeEntriesBuffer([]*channels.Entry{
 		msg,
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	db, err := field.NewMessageList(NewMockFile(buffer.Bytes()))
+	db, err := channels.NewListFile(NewMockFile(buffer.Bytes()))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	message, err := db.ReadNewestMessage(0)
+	message, err := db.ReadNewestEntry(0)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	parser.Assert(t, message, msg)
+	assert.DeepEqual(t, message, msg)
 }
 
 func TestMessageListLatest(t *testing.T) {
-	latest := field.Message{
+	latest := &channels.Entry{
 		Timestamp: 1722765647,
 		ChunkId:   2,
 		ChunkLine: 6,
 		UserId:    "1234567890abcdef",
 	}
-	buffer, err := getMessagesBuffer([]field.Message{
+	buffer, err := makeEntriesBuffer([]*channels.Entry{
 		{
 			Timestamp: 1722765698,
 			ChunkId:   1,
@@ -91,26 +89,26 @@ func TestMessageListLatest(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	db, err := field.NewMessageList(NewMockFile(buffer.Bytes()))
+	db, err := channels.NewListFile(NewMockFile(buffer.Bytes()))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	message, err := db.ReadNewestMessage(0)
+	message, err := db.ReadNewestEntry(0)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	parser.Assert(t, message, latest)
+	assert.DeepEqual(t, message, latest)
 
-	oldest, err := db.ReadOldestMessage(1)
+	oldest, err := db.ReadOldestEntry(1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	parser.Assert(t, message, oldest)
+	assert.DeepEqual(t, message, oldest)
 
-	_, err = db.ReadOldestMessage(2)
+	_, err = db.ReadOldestEntry(2)
 	if err != io.EOF {
 		t.Fatal(err)
 	}

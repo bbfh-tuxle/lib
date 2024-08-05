@@ -1,17 +1,16 @@
-package field_test
+package channels_test
 
 import (
-	"bufio"
 	"bytes"
-	"strings"
 	"testing"
 
-	"github.com/bbfh-tuxle/lib/field"
-	"github.com/bbfh-tuxle/lib/field/parser"
+	"github.com/bbfh-tuxle/lib/internal/stream"
+	"github.com/bbfh-tuxle/lib/tuxle/channels"
+	"gotest.tools/assert"
 )
 
 func TestParseMessage(t *testing.T) {
-	message := field.Message{
+	message := channels.Entry{
 		Timestamp: 1722765647,
 		ChunkId:   1,
 		ChunkLine: 0,
@@ -21,15 +20,15 @@ func TestParseMessage(t *testing.T) {
 	var buffer bytes.Buffer
 	message.Write(&buffer)
 
-	got, err := field.ReadMessage(bufio.NewReader(strings.NewReader(buffer.String())))
+	got, err := channels.ReadEntry(stream.NewReader(buffer.String()))
 	if err != nil {
 		t.Fatal(err)
 	}
-	parser.Assert(t, got, message)
+	assert.DeepEqual(t, got, &message)
 }
 
 func TestParseMultipleMessages(t *testing.T) {
-	messages := []field.Message{
+	messages := []channels.Entry{
 		{
 			Timestamp: 1722765647,
 			ChunkId:   2,
@@ -50,12 +49,12 @@ func TestParseMultipleMessages(t *testing.T) {
 		message.Write(&buffer)
 	}
 
-	var reader = bufio.NewReader(strings.NewReader(buffer.String()))
+	var reader = stream.NewReader(buffer.String())
 	for _, message := range messages {
-		got, err := field.ReadMessage(reader)
+		got, err := channels.ReadEntry(reader)
 		if err != nil {
 			t.Fatal(err)
 		}
-		parser.Assert(t, got, message)
+		assert.DeepEqual(t, got, &message)
 	}
 }

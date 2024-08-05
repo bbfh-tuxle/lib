@@ -1,4 +1,4 @@
-package field_test
+package channels_test
 
 import "io"
 
@@ -34,13 +34,13 @@ func (file *MockFile) ReadAt(p []byte, off int64) (int, error) {
 }
 
 // WriteAt writes len(p) bytes from p to the file at offset off
-func (m *MockFile) WriteAt(p []byte, off int64) (int, error) {
+func (file *MockFile) WriteAt(p []byte, off int64) (int, error) {
 	end := off + int64(len(p))
-	if end > int64(len(m.content)) {
+	if end > int64(len(file.content)) {
 		newContent := make([]byte, end)
-		copy(newContent, m.content)
-		m.content = newContent
+		copy(newContent, file.content)
+		file.content = newContent
 	}
-	n := copy(m.content[off:], p)
+	n := copy(file.content[off:], p)
 	return n, nil
 }

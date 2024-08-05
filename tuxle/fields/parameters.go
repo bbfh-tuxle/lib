@@ -1,14 +1,9 @@
-package field
+package fields
 
 import "io"
 
 // A map with extra convinient functions as a part of Tuxle format.
 type Parameters map[string]string
-
-// Get a new empty Parameters map.
-func NewParameters() Parameters {
-	return Parameters{}
-}
 
 // Write the Parameters to an io.Writter in the correct format.
 //
