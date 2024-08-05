@@ -113,3 +113,71 @@ func TestMessageListLatest(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestListFileAppend(t *testing.T) {
+	entry := &channels.Entry{
+		Timestamp: 123478127,
+		ChunkId:   1,
+		ChunkLine: 0,
+		UserId:    "root",
+	}
+
+	list, err := channels.NewListFile(NewMockFile([]byte{}))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = list.AppendEntry(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := list.ReadNewestEntry(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.DeepEqual(t, got, entry)
+}
+
+func TestListFileOverwrite(t *testing.T) {
+	entry := &channels.Entry{
+		Timestamp: 123478127,
+		ChunkId:   1,
+		ChunkLine: 0,
+		UserId:    "root",
+	}
+	entry2 := &channels.Entry{
+		Timestamp: 123478163,
+		ChunkId:   1,
+		ChunkLine: 1,
+		UserId:    "test",
+	}
+
+	list, err := channels.NewListFile(NewMockFile([]byte{}))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = list.AppendEntry(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = list.AppendEntry(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = list.OverwriteEntry(entry2, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := list.ReadOldestEntry(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.DeepEqual(t, got, entry2)
+}
