@@ -11,7 +11,7 @@ import (
 func ReadString(reader *bufio.Reader, delimiter byte) (string, error) {
 	data, err := reader.ReadString(delimiter)
 	if err != nil {
-		return "", err
+		return data, err
 	}
 
 	return data[:len(data)-1], nil
