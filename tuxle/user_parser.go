@@ -31,7 +31,7 @@ func ReadUser(id string, file channels.File) (User, error) {
 		return User{}, err
 	}
 
-	permissions, err := fields.ParsePermissions(fields.CAN_READ, parameters["Password"])
+	permissions, err := fields.ParsePermissions(fields.CAN_READ, parameters["Permissions"])
 	if err != nil {
 		return User{}, err
 	}
