@@ -6,9 +6,9 @@ import (
 )
 
 func parseLine(permissions *Permissions, str string) error {
-	parts := strings.SplitN(str, "=", 2)
+	parts := strings.SplitN(str, ":", 2)
 	if len(parts) != 2 {
-		return errors.New("Invalid permission format. Requires `[key]=[permission]`")
+		return errors.New("Invalid permission format. Requires `[key]:[permission]`")
 	}
 
 	switch parts[0] {

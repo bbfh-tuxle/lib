@@ -29,7 +29,7 @@ func TestPermissionCan(t *testing.T) {
 }
 
 func TestPermissionParse(t *testing.T) {
-	permissions, err := fields.ParsePermissions(fields.CAN_NOTHING, "server=rim*")
+	permissions, err := fields.ParsePermissions(fields.CAN_NOTHING, "server:rim*")
 	if err != nil {
 		t.Fatal(err)
 	}

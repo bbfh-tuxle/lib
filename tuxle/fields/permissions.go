@@ -23,9 +23,9 @@ func EmptyPermissions(all permMask) Permissions {
 
 func (permissions Permissions) String() string {
 	return strings.Join([]string{
-		fmt.Sprintf("server=%s", permissions.Server),
-		fmt.Sprintf("channels=%s", permissions.Channels),
-		fmt.Sprintf("messages=%s", permissions.Messages),
-		fmt.Sprintf("users=%s", permissions.Users),
+		fmt.Sprintf("server:%s", permissions.Server),
+		fmt.Sprintf("channels:%s", permissions.Channels),
+		fmt.Sprintf("messages:%s", permissions.Messages),
+		fmt.Sprintf("users:%s", permissions.Users),
 	}, ";")
 }
