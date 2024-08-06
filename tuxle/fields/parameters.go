@@ -1,6 +1,9 @@
 package fields
 
-import "io"
+import (
+	"fmt"
+	"io"
+)
 
 // A map with extra convinient functions as a part of Tuxle format.
 type Parameters map[string]string
@@ -10,9 +13,6 @@ type Parameters map[string]string
 // No-op when Parameters are empty.
 func (params Parameters) Write(buffer io.Writer) {
 	for key, value := range params {
-		buffer.Write([]byte(key))
-		buffer.Write([]byte{'='})
-		buffer.Write([]byte(value))
-		buffer.Write([]byte{'\n'})
+		fmt.Fprintf(buffer, "%s=%s\n", key, value)
 	}
 }
