@@ -103,3 +103,19 @@ func (db *Database) LimitedAppendChunk(chunk string, cycle int64) error {
 
 	return db.OverwriteChunk(chunk, db.Size%cycle)
 }
+
+// Returns whether database contains the chunk.
+func (db *Database) ContainsChunk(chunk string) bool {
+	for i := range db.Size {
+		line, err := db.ReadChunk(i)
+		if err != nil {
+			break
+		}
+
+		if line == chunk {
+			return true
+		}
+	}
+
+	return false
+}
