@@ -51,17 +51,22 @@ func (db *Database) ReadChunk(index int64) (string, error) {
 	return string(bytes.Trim(data, "\x00")), nil
 }
 
-// Appends a chunk to the end of the database.
-func (db *Database) AppendChunk(chunk string) error {
+func (db *Database) IncrementSize() error {
 	db.Size += 1
-
-	var data = make([]byte, db.ChunkSize)
-	copy(data[:], []byte(chunk))
 
 	byteSize := make([]byte, 8)
 	binary.BigEndian.PutUint64(byteSize, uint64(db.Size))
 
 	_, err := db.file.WriteAt(byteSize, 0)
+	return err
+}
+
+// Appends a chunk to the end of the database.
+func (db *Database) AppendChunk(chunk string) error {
+	var data = make([]byte, db.ChunkSize)
+	copy(data[:], []byte(chunk))
+
+	err := db.IncrementSize()
 	if err != nil {
 		return err
 	}
@@ -81,4 +86,20 @@ func (db *Database) OverwriteChunk(chunk string, index int64) error {
 
 	_, err := db.file.WriteAt(data, LIST_CONTENT_OFFSET+db.ChunkSize*index)
 	return err
+}
+
+// Appends a chunk to the end of the database.
+//
+// Limits the actual size of the file to several elements, replacing the oldest ones when needed.
+func (db *Database) LimitedAppendChunk(chunk string, cycle int64) error {
+	if db.Size < cycle {
+		return db.AppendChunk(chunk)
+	}
+
+	err := db.IncrementSize()
+	if err != nil {
+		return err
+	}
+
+	return db.OverwriteChunk(chunk, db.Size%cycle)
 }
