@@ -28,3 +28,11 @@ func (params Parameters) Validate(functions map[string]ValidateFunc) []error {
 
 	return items
 }
+
+func EnsureExist(keys ...string) map[string]ValidateFunc {
+	value := map[string]ValidateFunc{}
+	for _, key := range keys {
+		value[key] = Exists
+	}
+	return value
+}
