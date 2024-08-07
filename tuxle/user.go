@@ -21,7 +21,6 @@ func (user User) Parameters() fields.Parameters {
 		"Name":        user.Name,
 		"PictureURI":  user.PictureURI,
 		"Description": escape.EscapeString(user.Description),
-		"Password":    user.Password.String(),
 		"Permissions": user.Permissions.String(),
 	}
 }
